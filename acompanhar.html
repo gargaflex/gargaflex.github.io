@@ -24,7 +24,12 @@ li:last-child:after{display:none}
 <div class="card" id="box"><p class="muted">Carregando…</p></div>
 <script>
 const STEPS=[['aguardando_orcamento','Aguardando orçamento'],['aprovado','Aprovado'],['aguardando_peca','Aguardando peça'],['em_reparo','Em reparo'],['pronto','Pronto'],['entregue','Entregue']];
-const lab=id=>(STEPS.find(s=>s[0]===id)||[id,id])[1];
+function lab(id,pub){
+  if(id==='aguardando_peca' && pub && pub.k) return 'Aguardando '+pub.k;
+  if(id==='em_reparo' && pub && pub.k) return 'Trocando '+pub.k;
+  if(pub && pub.s===id && pub.l) return pub.l;
+  return (STEPS.find(s=>s[0]===id)||[id,id])[1];
+}
 function unpack(s){
   if(!s) return null;
   try{
@@ -44,13 +49,14 @@ function render(pub){
   document.getElementById('box').innerHTML=
     '<h1>ELITE <span>CELL</span></h1><p class="muted">Acompanhar reparo</p>'+
     '<p>'+marca+(numero?(' · '+numero):'')+'</p>'+
-    '<p><span class="badge">'+lab(cur)+'</span></p>'+
+    '<p><span class="badge">'+lab(cur,pub)+'</span></p>'+
+    (pub.k?('<p class="muted">Peça: '+pub.k+'</p>'):'')+
     (prazo?('<p class="muted">Prazo: '+prazo+'</p>'):'')+
     (nota?('<div class="alert">'+nota+'</div>'):'')+
     '<ul>'+STEPS.map((s,i)=>{
       const ev=tl.find?tl.filter(x=>(x.status||x[0])===s[0]).pop():null;
       const at=ev?(ev.at||ev[1]):'';
-      return '<li class="'+(i<=idx&&cur!=='recusado'?'now':'')+'"><b>'+s[1]+'</b><div class="muted">'+(at?new Date(at).toLocaleString('pt-BR'):(i<=idx?'Concluído':'Aguardando'))+'</div></li>';
+      return '<li class="'+(i<=idx&&cur!=='recusado'?'now':'')+'"><b>'+lab(s[0],pub)+'</b><div class="muted">'+(at?new Date(at).toLocaleString('pt-BR'):(i<=idx?'Concluído':'Aguardando'))+'</div></li>';
     }).join('')+'</ul>'+
     (cur==='pronto'?'<div class="alert"><b>Pronto para retirada.</b></div>':'')+
     '<p class="muted" style="margin-top:16px">Status no momento em que a loja enviou este link. Se mudar, você recebe outro no WhatsApp.</p>';
