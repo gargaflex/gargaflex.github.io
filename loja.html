@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#05070d"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Elite Cell"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<title>Elite Cell</title>
+<style>
+:root{--bg:#05070d;--card:#101726;--line:#1e2a44;--blue:#1e90ff;--text:#eef4ff;--muted:#8ea0c0;--ok:#3dd68c;--warn:#f5c542;--danger:#ff5d6c}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+.top{position:sticky;top:0;z-index:10;background:#05070d;padding:12px 12px 10px;padding-top:max(12px,env(safe-area-inset-top));border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center}
+.brand{font-weight:800;letter-spacing:.06em;flex:1}
+.brand span{color:var(--blue)}
+.btn{background:var(--blue);color:#041018;border:0;border-radius:12px;padding:12px 14px;font-weight:700;min-height:44px}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.ok{background:var(--ok);color:#052015}
+.btn.danger{background:var(--danger);color:#1a0508}
+.wrap{padding:12px;padding-bottom:calc(88px + env(safe-area-inset-bottom))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+.muted{color:var(--muted);font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,select,textarea{width:100%;background:#0b101c;border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 10px}
+label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
+.badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;background:#142033;color:#7eb8ff}
+.item{padding:12px 0;border-bottom:1px solid var(--line)}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--blue);color:#041018;border:0;border-radius:999px;padding:16px 20px;font-weight:800;z-index:20}
+.tabs{display:flex;gap:6px;overflow:auto;padding:8px 12px}
+.tabs button{flex:0 0 auto}
+.hidden{display:none!important}
+.lock{position:fixed;inset:0;background:#05070d;z-index:80;display:grid;place-items:center;padding:24px}
+.money-in{color:var(--ok)} .money-out{color:var(--danger)}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="brand">ELITE <span>CELL</span></div>
+  <button class="btn ghost" onclick="exportData()">Backup</button>
+  <button class="btn ghost" onclick="importData()">Restaurar</button>
+</div>
+<div class="tabs" id="tabs"></div>
+<div class="wrap" id="app"></div>
+<button class="fab" id="fab" onclick="novaOS()">+ OS</button>
+<input id="imp" type="file" accept="application/json" class="hidden" onchange="lerBackup(event)">
+<div id="lock" class="lock hidden"><div class="card" style="width:min(360px,100%)"><h2>ELITE CELL</h2><p class="muted">Senha da loja</p><input id="pin" type="password"><button class="btn" style="width:100%" onclick="unlock()">Entrar</button></div></div>
+<script>
+const STATUS=[{id:'aguardando_orcamento',l:'Aguardando orçamento'},{id:'aprovado',l:'Aprovado'},{id:'aguardando_peca',l:'Aguardando peça'},{id:'em_reparo',l:'Em reparo'},{id:'pronto',l:'Pronto'},{id:'entregue',l:'Entregue'},{id:'recusado',l:'Recusado'}];
+const KEY='elitecell_v2';
+const uid=()=>crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random());
+const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const today=()=>new Date().toISOString().slice(0,10);
+const sl=id=>(STATUS.find(s=>s.id===id)||{}).l||id;
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&','<':'<','>':'>','"':'"',"'":'&#39;'}[m]));
+function load(){
+  const raw=localStorage.getItem(KEY)||localStorage.getItem('elitecell_v1');
+  const base={clientes:[],os:[],produtos:[],caixa:[],tecnicos:[],vendedores:[],modelosOS:[],calculos:[],checklistItens:[],fechamentos:[],seq:1,cloudId:'',loja:{nome:'Elite Cell',garantiaPadrao:90,senhaLoja:'',whatsapp:'',endereco:'',cnpj:'56184927000183'}};
+  if(!raw) return base;
+  try{return Object.assign(base,JSON.parse(raw),{loja:Object.assign(base.loja,(JSON.parse(raw).loja||{}))});}catch(e){return base;}
+}
+let DB=load(), VIEW='dash';
+const save=()=>localStorage.setItem(KEY,JSON.stringify(DB));
+const cli=id=>DB.clientes.find(x=>x.id===id);
+function br(tel){let n=String(tel||'').replace(/\D/g,'');return n.startsWith('55')?n:((n.length===10||n.length===11)?'55'+n:n);}
+function tabs(){
+  const t=[['dash','Início'],['os','OS'],['clientes','Clientes'],['estoque','Estoque'],['fin','Caixa'],['rel','Loja']];
+  tabsEl.innerHTML=t.map(([id,n])=>`<button class="btn ${VIEW===id?'':'ghost'}" onclick="go('${id}')">${n}</button>`).join('');
+  fab.classList.toggle('hidden', VIEW!=='os' && VIEW!=='dash');
+}
+function go(v){VIEW=v;tabs();render();}
+function render(){({dash,os:renderOS,clientes:renderCli,estoque:renderEst,fin:renderFin,rel:renderRel}[VIEW]||dash)();}
+function dash(){
+  const ab=DB.os.filter(o=>!['entregue','recusado'].includes(o.status));
+  const pr=DB.os.filter(o=>o.status==='pronto');
+  app.innerHTML=`
+    <div class="card"><div class="muted">Em andamento</div><div style="font-size:28px;font-weight:800">${ab.length}</div></div>
+    <div class="card"><div class="muted">Prontos para retirada</div><div style="font-size:28px;font-weight:800">${pr.length}</div></div>
+    ${pr.map(o=>cardOS(o)).join('')}
+    <p class="muted">Este é o sistema no iPhone. Os dados ficam neste Safari. Use Backup no PC e Restaurar aqui para trazer as OS da loja.</p>`;
+}
+function cardOS(o){
+  const c=cli(o.clienteId);
+  return `<div class="card" onclick="abrirOS('${o.id}')"><b>${esc(o.numero)}</b> <span class="badge">${esc(sl(o.status))}</span>
+    <div>${esc(c?.nome||'')} · ${esc(o.marca||'')} ${esc(o.modelo||'')}</div>
+    <div class="muted">${esc(o.imei||'')} · ${money(o.valorOrcamento)}</div></div>`;
+}
+function renderOS(){
+  const list=DB.os.slice().sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+  app.innerHTML=`<input placeholder="Buscar OS, IMEI, nome" oninput="filtraOS(this.value)">
+    <div id="oslist">${list.map(cardOS).join('')||'<p class="muted">Nenhuma OS.</p>'}</div>`;
+}
+function filtraOS(q){
+  q=q.toLowerCase();
+  const list=DB.os.filter(o=>{const c=cli(o.clienteId);return `${o.numero} ${o.imei} ${o.marca} ${o.modelo} ${c?.nome}`.toLowerCase().includes(q);});
+  oslist.innerHTML=list.map(cardOS).join('')||'<p class="muted">Nada.</p>';
+}
+function renderCli(){
+  app.innerHTML=`<button class="btn" onclick="formCli()">+ Cliente</button>`+
+    DB.clientes.map(c=>`<div class="card"><b>${esc(c.nome)}</b><div class="muted">${esc(c.telefone||'')}</div>
+      <div class="row"><button class="btn ghost" onclick="formCli('${c.id}')">Editar</button>
+      <button class="btn ok" onclick="waNum('${esc(c.telefone||'')}')">WhatsApp</button></div></div>`).join('')||'<p class="muted">Cadastre um cliente.</p>';
+}
+function formCli(id){
+  const c=cli(id)||{nome:'',telefone:'',cpf:''};
+  app.innerHTML=`<div class="card"><label>Nome</label><input id="n" value="${esc(c.nome)}">
+    <label>Telefone</label><input id="t" value="${esc(c.telefone)}" inputmode="tel">
+    <label>CPF</label><input id="p" value="${esc(c.cpf||'')}">
+    <button class="btn" onclick="salvarCli('${id||''}')">Salvar</button>
+    <button class="btn ghost" onclick="go('clientes')">Voltar</button></div>`;
+}
+function salvarCli(id){
+  const data={nome:n.value.trim(),telefone:t.value.trim(),cpf:p.value.trim()};
+  if(!data.nome) return alert('Nome');
+  if(id) Object.assign(cli(id),data); else DB.clientes.push({id:uid(),...data,createdAt:new Date().toISOString()});
+  save(); go('clientes');
+}
+function novaOS(){
+  if(!DB.clientes.length){alert('Cadastre um cliente.');return go('clientes');}
+  formOS();
+}
+function formOS(id){
+  const o=DB.os.find(x=>x.id===id)||{status:'aguardando_orcamento',garantiaDias:DB.loja.garantiaPadrao||90};
+  app.innerHTML=`<div class="card">
+    <label>Cliente</label><select id="oc">${DB.clientes.map(c=>`<option value="${c.id}" ${o.clienteId===c.id?'selected':''}>${esc(c.nome)}</option>`).join('')}</select>
+    <label>Status</label><select id="osel">${STATUS.map(s=>`<option value="${s.id}" ${o.status===s.id?'selected':''}>${s.l}</option>`).join('')}</select>
+    <label>Marca</label><input id="oma" value="${esc(o.marca||'')}">
+    <label>Modelo</label><input id="omo" value="${esc(o.modelo||'')}">
+    <label>IMEI</label><input id="oi" value="${esc(o.imei||'')}" inputmode="numeric">
+    <label>Senha da tela</label><input id="ose" value="${esc(o.senha||'')}">
+    <label>Defeito</label><textarea id="od">${esc(o.defeito||'')}</textarea>
+    <label>Serviço</label><textarea id="og">${esc(o.diagnostico||'')}</textarea>
+    <label>Valor</label><input id="ov" type="number" inputmode="decimal" value="${esc(o.valorOrcamento||'')}">
+    <label>Sinal</label><input id="osi" type="number" inputmode="decimal" value="${esc(o.sinal||0)}">
+    <button class="btn" onclick="salvarOS('${id||''}')">Salvar OS</button>
+    ${id?`<button class="btn ok" onclick="waOS('${id}')">WhatsApp cliente</button>
+    <button class="btn danger" onclick="excluirOS('${id}')">Excluir</button>`:''}
+    <button class="btn ghost" onclick="go('os')">Voltar</button></div>`;
+}
+function salvarOS(id){
+  const data={clienteId:oc.value,status:osel.value,marca:oma.value.trim(),modelo:omo.value.trim(),imei:oi.value.trim(),senha:ose.value,defeito:od.value.trim(),diagnostico:og.value.trim(),valorOrcamento:Number(ov.value||0),sinal:Number(osi.value||0)};
+  if(id){ const prev=DB.os.find(x=>x.id===id); const from=prev.status; Object.assign(prev,data,{updatedAt:new Date().toISOString()}); if(from!==data.status){ prev.timeline=prev.timeline||[]; prev.timeline.push({status:data.status,at:new Date().toISOString()}); if(data.status==='entregue'&&from!=='entregue'){ const resto=Math.max(0,Number(prev.valorOrcamento||0)-Number(prev.sinal||0)); if(resto>0) DB.caixa.push({id:uid(),tipo:'entrada',valor:resto,descricao:'Saldo '+prev.numero,data:today(),categoria:'Serviço'}); } } }
+  else DB.os.push({id:uid(),numero:'OS-'+new Date().getFullYear()+'-'+String(DB.seq++).padStart(4,'0'),trackCode:'EC'+Math.random().toString(36).slice(2,7).toUpperCase(),...data,timeline:[{status:data.status,at:new Date().toISOString()}],createdAt:new Date().toISOString()});
+  save(); go('os');
+}
+function abrirOS(id){formOS(id);}
+function excluirOS(id){if(!confirm('Excluir?'))return;DB.os=DB.os.filter(x=>x.id!==id);save();go('os');}
+function waOS(id){
+  const o=DB.os.find(x=>x.id===id); const c=cli(o.clienteId); const to=br(c?.telefone);
+  if(!to) return alert('Cliente sem telefone');
+  const txt=`Olá ${(c.nome||'').split(' ')[0]}, *Elite Cell*\n${o.marca||''} ${o.modelo||''}\nOS ${o.numero}\nStatus: *${sl(o.status)}*\nValor: ${money(o.valorOrcamento)}`;
+  location.href='https://wa.me/'+to+'?text='+encodeURIComponent(txt);
+}
+function waNum(t){const n=br(t); if(!n) return alert('Sem telefone'); location.href='https://wa.me/'+n;}
+function renderEst(){
+  app.innerHTML=`<button class="btn" onclick="formProd()">+ Peça</button>`+
+    DB.produtos.map(p=>`<div class="card"><b>${esc(p.nome)}</b><div class="muted">Qtd ${p.qtd} · custo ${money(p.custo)} · venda ${money(p.preco)}</div>
+      <button class="btn ghost" onclick="formProd('${p.id}')">Editar</button></div>`).join('')||'<p class="muted">Estoque vazio.</p>';
+}
+function formProd(id){
+  const p=DB.produtos.find(x=>x.id===id)||{nome:'',qtd:0,custo:0,preco:0};
+  app.innerHTML=`<div class="card"><label>Nome</label><input id="pn" value="${esc(p.nome)}">
+    <label>Qtd</label><input id="pq" type="number" value="${p.qtd}">
+    <label>Custo</label><input id="pc" type="number" value="${p.custo||0}">
+    <label>Venda</label><input id="pp" type="number" value="${p.preco||0}">
+    <button class="btn" onclick="salvarProd('${id||''}')">Salvar</button>
+    <button class="btn ghost" onclick="go('estoque')">Voltar</button></div>`;
+}
+function salvarProd(id){
+  const data={nome:pn.value.trim(),qtd:Number(pq.value||0),custo:Number(pc.value||0),preco:Number(pp.value||0)};
+  if(!data.nome) return alert('Nome');
+  if(id) Object.assign(DB.produtos.find(x=>x.id===id),data); else DB.produtos.push({id:uid(),...data});
+  save(); go('estoque');
+}
+function renderFin(){
+  const dia=DB.caixa.filter(x=>x.data===today());
+  const e=dia.filter(x=>x.tipo==='entrada').reduce((a,c)=>a+Number(c.valor),0);
+  const s=dia.filter(x=>x.tipo==='saida').reduce((a,c)=>a+Number(c.valor),0);
+  app.innerHTML=`<div class="card"><div class="muted">Hoje</div><div class="money-in">${money(e)}</div><div class="money-out">${money(s)}</div></div>
+    <div class="row"><button class="btn ok" onclick="formCx('entrada')">+ Entrada</button><button class="btn danger" onclick="formCx('saida')">+ Saída</button></div>
+    ${DB.caixa.slice().reverse().slice(0,30).map(c=>`<div class="item"><b class="${c.tipo==='entrada'?'money-in':'money-out'}">${c.tipo==='entrada'?'+':'-'} ${money(c.valor)}</b><div class="muted">${esc(c.data)} · ${esc(c.descricao)}</div></div>`).join('')}`;
+}
+function formCx(tipo){
+  app.innerHTML=`<div class="card"><label>Valor</label><input id="xv" type="number" inputmode="decimal">
+    <label>Descrição</label><input id="xd">
+    <button class="btn" onclick="salvarCx('${tipo}')">Lançar</button>
+    <button class="btn ghost" onclick="go('fin')">Voltar</button></div>`;
+}
+function salvarCx(tipo){DB.caixa.push({id:uid(),tipo,valor:Number(xv.value||0),data:today(),descricao:xd.value,categoria:'Manual'});save();go('fin');}
+function renderRel(){
+  app.innerHTML=`<div class="card"><label>WhatsApp da loja</label><input id="lw" value="${esc(DB.loja.whatsapp||'')}" inputmode="tel">
+    <label>Senha do app</label><input id="lp" type="password" value="${esc(DB.loja.senhaLoja||'')}">
+    <label>CNPJ / PIX</label><input id="lc" value="${esc(DB.loja.cnpj||'')}">
+    <button class="btn" onclick="salvarLoja()">Salvar</button>
+    <p class="muted">No Safari: Compartilhar → Tela de Início. O ícone abre como app.</p></div>`;
+}
+function salvarLoja(){DB.loja.whatsapp=lw.value.replace(/\D/g,'');DB.loja.senhaLoja=lp.value;DB.loja.cnpj=lc.value;save();alert('Salvo');}
+function exportData(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(DB)],{type:'application/json'}));a.download='backup-elite-cell.json';a.click();}
+function importData(){imp.click();}
+function lerBackup(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.os||!d.clientes)return alert('Arquivo inválido');if(!confirm('Trocar os dados deste iPhone pelo backup?'))return;DB=d;save();go('dash');}catch(e){alert('Não leu o backup');}};r.readAsText(f);}
+function unlock(){if(pin.value===DB.loja.senhaLoja) lock.classList.add('hidden'); else alert('Senha incorreta');}
+(function(){
+  if(DB.loja.senhaLoja) lock.classList.remove('hidden');
+  tabs(); render();
+})();
+</script>
+</body>
+</html>
