@@ -1,161 +1,128 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#05070d" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Elite Cell" />
-  <title>Elite Cell</title>
-  <style>
-    :root { --bg:#05070d; --bg2:#0b101c; --card:#101726; --line:#1e2a44; --blue:#1e90ff; --blue2:#3aa0ff; --blue-dim:rgba(30,144,255,.14); --text:#eef4ff; --muted:#8ea0c0; --ok:#3dd68c; --warn:#f5c542; --danger:#ff5d6c; --radius:16px; }
-    * { box-sizing:border-box; }
-    html,body { margin:0; padding:0; background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif; }
-    button,input,select,textarea { font:inherit; color:inherit; }
-    body.shop { display:flex; min-height:100vh; }
-    .app { flex:1; max-width:1180px; margin:0 auto; padding:16px; width:100%; }
-    header.top { display:flex; align-items:center; gap:12px; padding:8px 0 16px; border-bottom:1px solid var(--line); margin-bottom:16px; }
-    .brand { display:flex; align-items:center; gap:12px; flex:1; min-width:0; }
-    .logo-mark { width:48px; height:48px; border-radius:12px; background:#070b14; border:1px solid #2a3d66; display:grid; place-items:center; }
-    .brand h1 { margin:0; font-size:18px; letter-spacing:.08em; }
-    .brand h1 span { color:var(--blue); }
-    .brand p { margin:2px 0 0; color:var(--muted); font-size:12px; }
-    .grid { display:grid; gap:12px; }
-    .cards-4 { grid-template-columns:repeat(2,1fr); }
-    @media (min-width:900px){ .cards-4 { grid-template-columns:repeat(4,1fr); } }
-    .stat,.card { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; }
-    .stat .k { color:var(--muted); font-size:12px; }
-    .stat .v { font-size:22px; font-weight:700; margin-top:6px; }
-    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-    .btn { background:var(--blue); color:#041018; border:0; border-radius:12px; padding:10px 14px; font-weight:700; cursor:pointer; }
-    .btn.ghost { background:transparent; color:var(--text); border:1px solid var(--line); }
-    .btn.danger { background:var(--danger); color:#1a0508; }
-    .btn.ok { background:var(--ok); color:#052015; }
-    .btn.sm { padding:7px 10px; font-size:13px; }
-    .search,input,select,textarea { width:100%; background:var(--bg2); border:1px solid var(--line); border-radius:12px; padding:11px 12px; outline:none; }
-    textarea { min-height:78px; resize:vertical; }
-    label { display:block; font-size:12px; color:var(--muted); margin:0 0 6px; }
-    .field { margin-bottom:12px; }
-    .form-grid { display:grid; gap:12px; grid-template-columns:1fr; }
-    @media (min-width:700px){ .form-grid.two { grid-template-columns:1fr 1fr; } }
-    table { width:100%; border-collapse:collapse; font-size:13px; }
-    th,td { text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
-    th { color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase; }
-    .badge { display:inline-block; padding:3px 8px; border-radius:999px; font-size:11px; font-weight:700; }
-    .s-aguardando_orcamento { background:#2a2410; color:var(--warn); }
-    .s-aprovado { background:var(--blue-dim); color:var(--blue2); }
-    .s-aguardando_peca { background:#2a1c10; color:#ffb060; }
-    .s-em_reparo { background:#142033; color:#7eb8ff; }
-    .s-pronto { background:#10281c; color:var(--ok); }
-    .s-entregue { background:#1a1f2a; color:#9aa8c0; }
-    .s-recusado { background:#2a1216; color:var(--danger); }
-    nav.side { width:236px; flex-shrink:0; background:#080c16; border-right:1px solid var(--line); padding:16px 12px; display:flex; flex-direction:column; gap:6px; position:sticky; top:0; height:100vh; }
-    nav.side .nav-title { color:var(--muted); font-size:11px; letter-spacing:.12em; text-transform:uppercase; padding:8px 10px 12px; }
-    nav.side button { background:transparent; border:0; color:var(--muted); text-align:left; padding:11px 12px; border-radius:12px; cursor:pointer; font-size:14px; font-weight:600; }
-    nav.side button:hover { background:var(--blue-dim); color:var(--text); }
-    nav.side button.active { background:var(--blue); color:#041018; }
-    nav.side .quick { margin-top:auto; }
-    .menu-btn { display:none; }
-    @media (max-width:800px){
-      body.shop { display:block; }
-      .app { padding:12px 12px 28px; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
-      header.top { flex-wrap:wrap; }
-      header.top .search { max-width:none !important; flex:1 1 100%; }
-      nav.side { position:fixed; left:0; top:0; bottom:0; z-index:30; transform:translateX(-105%); transition:transform .2s ease; width:min(280px,86vw); padding-top: calc(16px + env(safe-area-inset-top)); }
-      nav.side.open { transform:translateX(0); }
-      .menu-btn { display:inline-flex; min-height:42px; }
-      .side-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:25; }
-      .side-bg.show { display:block; }
-      .btn { min-height:44px; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#05070d"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Elite Cell</title>
+<style>
+:root{--bg:#05070d;--bg2:#0b101c;--card:#101726;--line:#1e2a44;--blue:#1e90ff;--text:#eef4ff;--muted:#8ea0c0;--ok:#3dd68c;--danger:#ff5d6c;--warn:#f5c542;--radius:16px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:rgba(30,144,255,.35)}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit;touch-action:manipulation}
+.btn{background:var(--blue);color:#041018;border:0;border-radius:12px;padding:12px 14px;font-weight:700;min-height:44px}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.ok{background:var(--ok);color:#052015}
+.btn.danger{background:var(--danger);color:#1a0508}
+.wrap{padding:12px;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+.top{position:sticky;top:0;z-index:8;background:#05070d;padding:12px;padding-top:max(12px,env(safe-area-inset-top));display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.brand{font-weight:800;flex:1}.brand span{color:var(--blue)}
+.tabs{display:flex;gap:6px;overflow:auto;padding:8px 12px;-webkit-overflow-scrolling:touch}
+.tabs button{flex:0 0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:0 0 10px}
+.muted{color:var(--muted);font-size:13px}
+input,select,textarea{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 10px}
+label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
+.badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;background:#142033;color:#7eb8ff}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--blue);color:#041018;border:0;border-radius:999px;padding:16px 20px;font-weight:800;z-index:20}
+.hidden{display:none!important}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:50;display:flex;align-items:flex-end}
+.modal{background:var(--bg2);width:100%;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.stat .k{color:var(--muted);font-size:12px}.stat .v{font-size:24px;font-weight:800}
+</style></head>
+<body>
+<div class="top"><div class="brand">ELITE <span>CELL</span></div></div>
+<div class="tabs" id="tabs"></div>
+<div class="wrap" id="app"></div>
+<button class="fab" id="fab" type="button">+ OS</button>
+<div id="modalRoot"></div>
+<script>
+const STATUS=[{id:'aguardando_orcamento',l:'Aguardando orçamento'},{id:'aprovado',l:'Aprovado'},{id:'aguardando_peca',l:'Aguardando peça'},{id:'em_reparo',l:'Em reparo'},{id:'pronto',l:'Pronto'},{id:'entregue',l:'Entregue'},{id:'recusado',l:'Recusado'}];
+const KEY='elitecell_v2';
+const uid=()=>String(Date.now()+Math.random());
+const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const today=()=>new Date().toISOString().slice(0,10);
+const sl=id=>(STATUS.find(s=>s.id===id)||{}).l||id;
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&','<':'<','>':'>','"':'"',"'":'&#39;'}[m]));
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY)||localStorage.getItem('elitecell_v1');
+    const base={clientes:[],os:[],produtos:[],caixa:[],tecnicos:[],vendedores:[],modelosOS:[],seq:1,loja:{nome:'Elite Cell',cnpj:'56.184.927/0001-83',whatsapp:'',senhaLoja:''}};
+    if(!raw) return base;
+    return Object.assign(base,JSON.parse(raw),{loja:Object.assign(base.loja,(JSON.parse(raw).loja||{}))});
+  }catch(e){return {clientes:[],os:[],produtos:[],caixa:[],tecnicos:[],vendedores:[],modelosOS:[],seq:1,loja:{}};} 
+}
+let DB=load(), VIEW='dash';
+const save=()=>localStorage.setItem(KEY,JSON.stringify(DB));
+const cli=id=>DB.clientes.find(x=>x.id===id);
+function tabs(){
+  const t=[['dash','Início'],['os','OS'],['clientes','Clientes'],['estoque','Estoque'],['fin','Caixa'],['rel','Loja']];
+  document.getElementById('tabs').innerHTML=t.map(([id,n])=>'<button type="button" class="btn '+(VIEW===id?'':'ghost')+'" data-go="'+id+'">'+n+'</button>').join('');
+}
+function go(v){VIEW=v;tabs();render();}
+function render(){
+  if(VIEW==='dash'){
+    const ab=DB.os.filter(o=>!['entregue','recusado'].includes(o.status));
+    app.innerHTML='<div class="grid"><div class="stat"><div class="k">Em andamento</div><div class="v">'+ab.length+'</div></div><div class="stat"><div class="k">Prontos</div><div class="v">'+DB.os.filter(o=>o.status==="pronto").length+'</div></div></div><button type="button" class="btn" id="bCli">+ Cliente</button> <button type="button" class="btn ghost" id="bOS">+ OS</button><p class="muted" style="margin-top:12px">1) Cadastre um cliente. 2) Toque + OS.</p>';
+  } else if(VIEW==='clientes'){
+    app.innerHTML='<button type="button" class="btn" id="bCli">+ Cliente</button>'+(DB.clientes.map(c=>'<div class="card"><b>'+esc(c.nome)+'</b><div class="muted">'+esc(c.telefone||'')+'</div></div>').join('')||'<p class="muted">Nenhum cliente.</p>');
+  } else if(VIEW==='os'){
+    app.innerHTML='<button type="button" class="btn" id="bOS">+ OS</button>'+(DB.os.slice().reverse().map(o=>'<div class="card" data-os="'+o.id+'"><b>'+esc(o.numero)+'</b> <span class="badge">'+esc(sl(o.status))+'</span><div>'+esc((cli(o.clienteId)||{}).nome||'')+' · '+esc(o.marca||'')+' '+esc(o.modelo||'')+'</div></div>').join('')||'<p class="muted">Nenhuma OS.</p>');
+  } else if(VIEW==='estoque'){
+    app.innerHTML='<button type="button" class="btn" id="bProd">+ Peça</button>'+(DB.produtos.map(p=>'<div class="card"><b>'+esc(p.nome)+'</b><div class="muted">Qtd '+p.qtd+' · '+money(p.preco)+'</div></div>').join('')||'<p class="muted">Vazio.</p>');
+  } else if(VIEW==='fin'){
+    app.innerHTML='<button type="button" class="btn ok" id="bIn">+ Entrada</button> <button type="button" class="btn danger" id="bOut">+ Saída</button>'+DB.caixa.slice().reverse().slice(0,20).map(c=>'<div class="card">'+esc(c.data)+' · '+esc(c.descricao)+' · '+money(c.valor)+'</div>').join('');
+  } else {
+    app.innerHTML='<div class="card"><label>WhatsApp da loja</label><input id="lw" value="'+esc(DB.loja.whatsapp||'')+'"><label>CNPJ PIX</label><input id="lc" value="'+esc(DB.loja.cnpj||'')+'"><button type="button" class="btn" id="bSave">Salvar</button></div>';
+  }
+}
+function modal(t,h){modalRoot.innerHTML='<div class="modal-bg" id="mbg"><div class="modal"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">'+t+'</h3><button type="button" class="btn ghost" id="bClose">Fechar</button></div>'+h+'</div></div>';}
+function closeM(){modalRoot.innerHTML='';}
+function formCli(){modal('Cliente','<label>Nome</label><input id="n"><label>Telefone</label><input id="t" inputmode="tel"><button type="button" class="btn" id="bSaveCli">Salvar cliente</button>');}
+function saveCli(){
+  const nome=(document.getElementById('n')||{}).value||'';
+  if(!nome.trim()) return;
+  DB.clientes.push({id:uid(),nome:nome.trim(),telefone:(document.getElementById('t')||{}).value||''});
+  save(); closeM(); go('clientes');
+}
+function formOS(){
+  if(!DB.clientes.length){ go('clientes'); formCli(); return; }
+  modal('Nova OS','<label>Cliente</label><select id="oc">'+DB.clientes.map(c=>'<option value="'+c.id+'">'+esc(c.nome)+'</option>').join('')+'</select><label>Marca</label><input id="oma"><label>Modelo</label><input id="omo"><label>IMEI</label><input id="oi"><label>Defeito</label><textarea id="od"></textarea><label>Valor</label><input id="ov" type="number" inputmode="decimal"><button type="button" class="btn" id="bSaveOS">Salvar OS</button>');
+}
+function saveOS(){
+  DB.os.push({id:uid(),numero:'OS-'+new Date().getFullYear()+'-'+String(DB.seq++).padStart(4,'0'),clienteId:oc.value,marca:oma.value,modelo:omo.value,imei:oi.value,defeito:od.value,valorOrcamento:Number(ov.value||0),status:'aguardando_orcamento',createdAt:new Date().toISOString()});
+  save(); closeM(); go('os');
+}
+function formProd(){modal('Peça','<label>Nome</label><input id="pn"><label>Qtd</label><input id="pq" type="number" value="1"><label>Venda</label><input id="pp" type="number"><button type="button" class="btn" id="bSaveP">Salvar</button>');}
+function saveProd(){if(!pn.value.trim())return;DB.produtos.push({id:uid(),nome:pn.value.trim(),qtd:Number(pq.value||0),preco:Number(pp.value||0)});save();closeM();go('estoque');}
+function formCx(tipo){modal(tipo==='entrada'?'Entrada':'Saída','<label>Valor</label><input id="xv" type="number" inputmode="decimal"><label>Descrição</label><input id="xd"><button type="button" class="btn" id="bSaveX">Lançar</button>'); document.getElementById('bSaveX').onclick=()=>{DB.caixa.push({id:uid(),tipo,valor:Number(xv.value||0),data:today(),descricao:xd.value});save();closeM();go('fin');};}
+document.body.addEventListener('click',function(e){
+  const b=e.target.closest('button');
+  if(!b) {
+    const card=e.target.closest('[data-os]');
+    if(card){
+      const o=DB.os.find(x=>x.id===card.getAttribute('data-os'));
+      if(o) modal(o.numero,'<p>'+esc(sl(o.status))+'</p><label>Status</label><select id="nst">'+STATUS.map(s=>'<option value="'+s.id+'" '+(o.status===s.id?'selected':'')+'>'+s.l+'</option>').join('')+'</select><button type="button" class="btn" id="bSt">Atualizar</button>');
+      const bs=document.getElementById('bSt'); if(bs) bs.onclick=()=>{o.status=nst.value;save();closeM();go('os');};
     }
-    .hidden { display:none !important; }
-    .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:40; display:flex; align-items:flex-end; justify-content:center; }
-    @media (min-width:720px){ .modal-bg { align-items:center; } .modal { border-radius:20px; } }
-    .modal { background:var(--bg2); border:1px solid var(--line); border-radius:20px 20px 0 0; width:min(780px,100%); max-height:92vh; overflow:auto; padding:16px; }
-    .photos { display:flex; gap:8px; flex-wrap:wrap; }
-    .photos img { width:84px; height:84px; object-fit:cover; border-radius:10px; border:1px solid var(--line); }
-    .alert { background:#13281d; border:1px solid #245c3c; color:#b6f0cf; padding:10px 12px; border-radius:12px; margin-bottom:12px; }
-    .alert.warn { background:#2a2410; border-color:#5c4a18; color:#f5e3a1; }
-    .muted { color:var(--muted); }
-    .money-in { color:var(--ok); }
-    .money-out { color:var(--danger); }
-    .check { display:grid; gap:8px; grid-template-columns:1fr; }
-    @media (min-width:700px){ .check { grid-template-columns:1fr 1fr; } }
-    .ck-row { display:flex; align-items:center; justify-content:space-between; gap:8px; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 10px; }
-    .ck-row span { font-size:13px; }
-    .ck-row select { width:auto; max-width:140px; padding:6px 8px; }
-    .lock { position:fixed; inset:0; background:#05070d; z-index:80; display:grid; place-items:center; padding:24px; }
-    @media print {
-      nav.side, header.top, .no-print, .menu-btn { display:none !important; }
-      body, .app { background:#fff; color:#000; padding:0; display:block; }
-      .print-only { display:block !important; }
-    }
-    .print-only { display:none; }
-    .thermal { width:280px; font-size:12px; }
-    .timeline { list-style:none; margin:0; padding:0; }
-    .timeline li { position:relative; padding:0 0 18px 28px; }
-    .timeline li:before { content:""; position:absolute; left:6px; top:8px; width:10px; height:10px; border-radius:50%; background:#3a4a66; border:2px solid #1e90ff; }
-    .timeline li.done:before { background:#1e90ff; }
-    .timeline li.now:before { background:#3dd68c; }
-    .timeline li:after { content:""; position:absolute; left:10px; top:20px; bottom:0; width:2px; background:#1e2a44; }
-    .timeline li:last-child:after { display:none; }
-  </style>
-</head>
-<body class="shop">
-  <div class="side-bg no-print" id="sideBg" onclick="toggleMenu(false)"></div>
-  <nav class="side no-print" id="sideNav">
-    <div class="nav-title">Elite Cell</div>
-    <button data-view="dash" class="active" onclick="go('dash')">Início</button>
-    <button data-view="clientes" onclick="go('clientes')">Clientes</button>
-    <button data-view="os" onclick="go('os')">Ordens de serviço</button>
-    <button data-view="modelos" onclick="go('modelos')">Modelos de OS</button>
-    <button data-view="tecnicos" onclick="go('tecnicos')">Técnicos</button>
-    <button data-view="vendedores" onclick="go('vendedores')">Vendedores</button>
-    <button data-view="estoque" onclick="go('estoque')">Estoque</button>
-    <button data-view="lucro" onclick="go('lucro')">Cálculo de lucro</button>
-    <button data-view="fin" onclick="go('fin')">Caixa</button>
-    <button data-view="rel" onclick="go('rel')">Relatórios</button>
-    <button data-view="whats" onclick="go('whats')">WhatsApp</button>
-    <button class="quick" onclick="novaOS()">+ Nova OS</button>
-  </nav>
-  <div class="app">
-    <header class="top">
-      <button class="btn ghost sm menu-btn no-print" onclick="toggleMenu(true)">Menu</button>
-      <div class="brand">
-        <div class="logo-mark"><svg width="30" height="30" viewBox="0 0 64 64" fill="none"><rect x="18" y="6" width="28" height="52" rx="6" stroke="#dfe7f5" stroke-width="3"/><path d="M26 22h8c4 0 7 3 7 7s-3 7-7 7h-4l8 12" stroke="#1e90ff" stroke-width="3.2" stroke-linecap="round"/></svg></div>
-        <div><h1>ELITE <span>CELL</span></h1><p>Assistência técnica</p></div>
-      </div>
-      <input id="qglobal" class="search no-print" style="max-width:260px" placeholder="IMEI, telefone, OS..." onkeydown="if(event.key==='Enter')buscaGlobal()">
-      <button class="btn ghost sm no-print" onclick="buscaGlobal()">Buscar</button>
-      <button class="btn ghost sm no-print" onclick="exportData()">Backup</button>
-      <button class="btn ghost sm no-print" onclick="importData()">Restaurar</button>
-      <button class="btn ghost sm no-print" onclick="travar()">Travar</button>
-      <input id="impFile" type="file" accept="application/json" class="hidden" onchange="lerBackup(event)">
-    </header>
-    <section id="view-dash"></section>
-    <section id="view-clientes" class="hidden"></section>
-    <section id="view-os" class="hidden"></section>
-    <section id="view-modelos" class="hidden"></section>
-    <section id="view-tecnicos" class="hidden"></section>
-    <section id="view-vendedores" class="hidden"></section>
-    <section id="view-estoque" class="hidden"></section>
-    <section id="view-lucro" class="hidden"></section>
-    <section id="view-fin" class="hidden"></section>
-    <section id="view-rel" class="hidden"></section>
-    <section id="view-whats" class="hidden"></section>
-    <section id="view-track" class="hidden"></section>
-  </div>
-  <div id="modalRoot"></div>
-  <div id="printArea" class="print-only"></div>
-  <div id="lockScreen" class="lock hidden">
-    <div class="card" style="width:min(380px,100%)">
-      <h2 style="margin-top:0">ELITE <span style="color:var(--blue)">CELL</span></h2>
-      <p class="muted">Senha da loja</p>
-      <input id="lockPin" type="password">
-      <button class="btn" style="margin-top:12px;width:100%" onclick="unlock()">Entrar</button>
-    </div>
-  </div>
-<script src="app-a.js"></script>
-<script src="app-b.js"></script>
-</body>
-</html>
+    if(e.target.id==='mbg') closeM();
+    return;
+  }
+  const g=b.getAttribute('data-go'); if(g) return go(g);
+  if(b.id==='bCli'||b.id==='fab'&&!DB.clientes.length) return formCli();
+  if(b.id==='bOS'||b.id==='fab') return formOS();
+  if(b.id==='bClose') return closeM();
+  if(b.id==='bSaveCli') return saveCli();
+  if(b.id==='bSaveOS') return saveOS();
+  if(b.id==='bProd') return formProd();
+  if(b.id==='bSaveP') return saveProd();
+  if(b.id==='bIn') return formCx('entrada');
+  if(b.id==='bOut') return formCx('saida');
+  if(b.id==='bSave'){DB.loja.whatsapp=lw.value;DB.loja.cnpj=lc.value;save();b.textContent='Salvo';}
+});
+tabs(); render();
+</script>
+</body></html>
